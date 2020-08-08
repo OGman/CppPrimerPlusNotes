@@ -21,3 +21,7 @@ This repository is used for recording my C++ primer excises
     函数建议在头文件中声明，在源文件中定义
     变量也一样
 
+第七章 类
+
+7.2 访问控制与封装
+
