@@ -43,5 +43,5 @@
 ## 7.3 类的其它特性
 ### 7.3.1 类成员再探
 - 定义类型成员
-     'typedef std::string::size_type pos;'
+    `typedef std::string::size_type pos;`
     
