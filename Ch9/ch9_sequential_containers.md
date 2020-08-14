@@ -16,4 +16,10 @@ vector是可变长的数组，内部所有元素都是存储在连续内存空�
   - shrink_to_fit()将capacity()减少到与size()相同
   - capacity() 返回当前能容纳的元素数
   - reserve(n) 分配至少能容纳n个元素的内存空间
- 
+## 9.5 额外的string操作
+string可以说是最为常用的数据类型，对于string提供了大量的特有的操作
+### 9.5.1 构造string的方法
+### 9.5.2 改变string的方法
+### 9.5.3 string搜索操作
+### 9.5.4 compare函数
+### 9.5.5 数值转换
