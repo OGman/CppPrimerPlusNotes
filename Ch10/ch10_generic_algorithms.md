@@ -37,3 +37,26 @@ stable_sor(words.begin(), words.end(), isShorter); //相等元素不改变原有
 背景问题：
 一个算法接受一个一元谓词，而我们需要传递两个参数进去
 - 介绍lambda
+### 10.3.3 lambda捕获和返回
+### 10.3.4 参数绑定
+- 标准库bind函数
+- 绑定check_size的sz参数
+- 使用placeholders名字
+- bind的参数
+- 用bind重排参数顺序
+- 绑定引用参数
+
+bind与lambda表达式都是产生一个可调用对象。lambda表达式用来写简短功能单一的小函数，bind用来将原有的函数进行调整
+## 10.4 再探迭代器
+除了普通的迭代器还有以下几种：
+- 反向迭代器
+- 插入迭代器
+- 流迭代器
+- 移动迭代器
+### 10.4.1 插入迭代器
+插入器三种类型：
+1. back_inserter
+2. front_inserter
+3. inserter
+分别使用容器的push_back,push_front,insert方法
+
