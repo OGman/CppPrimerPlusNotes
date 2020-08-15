@@ -34,4 +34,6 @@ sort(words.begin(), words.end(), isShorter);
 stable_sor(words.begin(), words.end(), isShorter); //相等元素不改变原有顺序
 ```
 ### 10.3.2 lambda表达式
-
+背景问题：
+一个算法接受一个一元谓词，而我们需要传递两个参数进去
+- 介绍lambda
