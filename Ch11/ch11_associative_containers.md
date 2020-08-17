@@ -46,5 +46,18 @@ while (map_it != word_count.cend())
 - 关联容器和算法
 我们一般不对关联容器使用泛型算法。有写操作的的泛型算法无法用于关联容器，因为set的元素是const，而map的元素中pair.first为const。
 ### 11.3.2 添加元素
+insert操作，由于set和map没有重复元素，向其中添加已存在的元素是没有效果的
+- 向map添加元素
+要插入一个pair对象
+```
+word_count.insert({word, 1});
+word_count.insert(make_pair(word, 1));
+```
+- 检测insert的返回值
 
+insert返回值为一个pair，其中first是一个迭代器，second是bool，表明是否成功，如果插入的元素已经存在，则插入失败，不进行插入操作，返回false
+- 展开递增语句
+- 向multiset或multimap添加元素
+
+对map来说如果一个key对应多个元素可以用multimap
 ## 11.4 无序容器
