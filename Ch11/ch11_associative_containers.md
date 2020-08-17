@@ -27,7 +27,24 @@ map<string, string> autors = {{"Zhang", "San"}, {"Li", "Si"}, {"Wang", "Wu"}};
 ### 11.2.3 pair类型
 在<utility>中
 map的元素是pair类型
-  `make_pair(v1, v2)`
+`make_pair(v1, v2)`
+  
 ## 11.3 关联容器操作
+key_type 关键词类型
+value_type 对于set与key_type相同，对于map为pair<const key_type, mapped_type>
+mapped_type 只适用于map，为关键字所关联到的类型，即pair.second的类型
+### 11.3.1 关联容器迭代器
+- set的迭代器是const的，map的key是const的
+- 遍历关联容器
+```
+auto map_it = word_count.cbegin();
+while (map_it != word_count.cend())
+{
+  ++map_it;
+}
+```
+- 关联容器和算法
+我们一般不对关联容器使用泛型算法。有写操作的的泛型算法无法用于关联容器，因为set的元素是const，而map的元素中pair.first为const。
+### 11.3.2 添加元素
 
 ## 11.4 无序容器
