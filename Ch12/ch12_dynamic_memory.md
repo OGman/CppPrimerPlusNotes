@@ -65,3 +65,33 @@ weak_ptr指向shared_ptr指向的对象，但不改变shared_ptr的引用计数�
 标准库提供了一个可以管理动态数组的unique_ptr: `unique_ptr<int[]> up(new int[10] ());`，调用release()时，会自动调用delete[]。
 还可以直接使用下标方位元素。
 ### 12.2.2 allocator类
+new将分配内存和构造对象组合在一起，灵活性有局限。当我们分配单个对象时，分配内存和初始化一般放在一起。但当我们分配大块内存时，一般是计划在这块内存上按需构造对象。另外，没有默认构造函数的类不能动态分配数组。
+- allocator类
+allocator是一个模板，要提供需要分配的类型，对象分配内存时按照类型分配合适的大小和对齐位置。allocator分配的是原始未构造的内存。
+```
+allocator<string> alloc;
+auto const p = alloc.allocate(n);
+```
+- allocator分配未构造的内存
+对于未构造的内存，我们必须用construct来构造对象
+```
+auto q = p;
+alloc.construct(q++);
+alloc.construct(q++, "hello");
+```
+对象使用完后，要用destroy来进行销毁。
+```
+while (q != p)
+  alloc.destroy(--q);
+```
+使用deallocate释放内存，`alloc.deallocate(p, n)`
+问题：使用了一部分可以将未使用的部分释放吗。
+- 拷贝和填充未初始化内存的算法
+```
+uninitialized_copy(b, e, b2) //区间
+uninitialized_copy_n(b, n, b2)  //个数
+uninitialized_fill(b, e, t)
+uninitialized_fill_n(b, n, t)
+```
+返回值为构造完成的最后一个元素后面的迭代器
+## 12.3 使用标准库：文本查询程序
