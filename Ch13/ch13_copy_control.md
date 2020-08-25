@@ -38,3 +38,15 @@ class Foo
 4. 动态分配对象的指针使用delete时，对象被销毁
 5. 临时对象当语句执行完毕时被销毁
 ### 13.1.4 三/五法则
+### 13.1.5 使用=default
+### 13.1.6 组织拷贝
+- 定义删除的函数
+```
+struct Nocopy {
+  Nocopy() = default;
+  Nocopy(const Nocopy&) = delete;
+  Nocopy &operator=(const Nocopy&) = delete;
+  ~Nocopy() = default;
+}
+```
+- 析构函数不能是删除的成员
