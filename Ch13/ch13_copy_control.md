@@ -23,7 +23,7 @@
 ### 13.1.3 析构函数
 构造函数初始化非static数据成员。析构函数释放对象使用的资源，并销毁非static数据成员。
 析构函数：
-```
+```C++
 class Foo
 {
   ~Foo();
@@ -42,7 +42,7 @@ class Foo
 ### 13.1.5 使用=default
 ### 13.1.6 阻止拷贝
 - 定义删除的函数
-```
+```C++
 struct Nocopy {
   Nocopy() = default;
   Nocopy(const Nocopy&) = delete;
@@ -82,7 +82,7 @@ private:
 ```
 - 类值拷贝赋值运算符
 赋值运算符通常组合了析构函数和拷贝构造函数的操作，类似析构函数，赋值操作会销毁左侧对象的资源，类似拷贝构造函数，赋值操作从右侧对象拷贝数据。赋值运算符必须满足一种特殊情况：自赋值时不出错。这种情况的问题在于，如果我们首先析构左侧，则对象的资源将被释放，再拷贝就丢失了原有的资源。
-```
+```C++
 HasPtr& operator=(const HasPtr &rhs)
 {
   auto newp = new string(const HasPtr *rhs);
@@ -104,7 +104,7 @@ HasPtr& operator=(const HasPtr &rhs)
 3. 析构函数递减引用计数，当引用计数为0时，释放资源
 4. 赋值运算符递增右侧引用计数，递减左侧对象的引用计数
 - 定义一个使用引用计数的类
-```
+```C++
 class HasPtr {
 public:
   HasPtr(const std::string &s = std::string()):
@@ -122,7 +122,7 @@ private:
 其中的拷贝构造函数拷贝了类的三个数据成员，并且递增了引用计数
 - 类指针的拷贝成员“篡改”引用计数
 析构函数递减引用计数，如果引用计数为0，则释放ps指向的string：
-```
+```C++
 HasPtr::~HasPtr()
 {
   if (--*use == 0)
@@ -133,7 +133,7 @@ HasPtr::~HasPtr()
 }
 ```
 拷贝赋值运算符递增右侧对象的引用计数，递减左侧对象的引用计数，如果引用计数为0，需要释放左侧对象的资源。
-```
+```C++
 HasPtr& HasPtr::operator=(const HasPtr &rhs)
 {
   ++ *rhs.use;
@@ -151,7 +151,7 @@ HasPtr& HasPtr::operator=(const HasPtr &rhs)
 ## 13.3 交换操作
   对于管理资源的类通常应当定义自己的swap。对于与重排元素顺序算法一起使用的类swap是非常重要的。
   交换操作通常要做一次拷贝，两次赋值，对于两个指针：
-  ```
+  ```C++
     HasPtr c = a; // 拷贝
     a = b; // 赋值
     b = c; // 赋值
