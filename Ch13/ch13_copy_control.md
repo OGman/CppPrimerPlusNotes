@@ -156,4 +156,17 @@ HasPtr& HasPtr::operator=(const HasPtr &rhs)
     a = b; // 赋值
     b = c; // 赋值
   ```
-  - 
+- 编写我们自己的swap函数
+```C++
+class HasPtr {
+  friend void swap(HasPtr &lhs, HasPtr &rhs);
+};
+inline
+void swap(HasPtr &lhs, HasPtr &rhs)
+{
+  using std::swap;
+  swap(lhs.ps, rhs.ps);
+  swap(lhs.i, rhs.i);
+}
+```
+- swap函数应调用swap，而不是std::swap
