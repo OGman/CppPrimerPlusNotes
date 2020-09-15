@@ -95,5 +95,65 @@ HasPtr& operator=(const HasPtr &rhs)
 本例使用了临时变量来保存对象内的资源
 ### 13.2.2 定义行为像指针的类
 创建像指针的类时，我们要考虑资源的释放方式，由于可能会有很多对象共享共同的资源，因此不能随意释放指针指向的资源。
-智能指针完美契合这一使用场景，资源释放由智能指针来完成，
-
+智能指针完美契合这一使用场景，资源释放由智能指针来完成可以极大地简化我们的工作。
+如果我们需要直接管理资源，使用引用计数是比较合适的方式。
+- 引用计数
+引用计数的工作方式如下：
+1. 构造函数需要创建引用计数
+2. 拷贝构造函数递增引用计数
+3. 析构函数递减引用计数，当引用计数为0时，释放资源
+4. 赋值运算符递增右侧引用计数，递减左侧对象的引用计数
+- 定义一个使用引用计数的类
+```
+class HasPtr {
+public:
+  HasPtr(const std::string &s = std::string()):
+    ps(new std::string(s)), i(0), use(new std::size_t(1)) {}
+  HasPtr(const HasPtr &p):
+    ps(p.ps), i(p.i), use(p.use) {++*use;}
+  HasPtr& operator=(const HasPtr&);
+  ~HasPtr();
+private:
+  std::string *ps;
+  int i;
+  std::size_t *use;
+};
+```
+其中的拷贝构造函数拷贝了类的三个数据成员，并且递增了引用计数
+- 类指针的拷贝成员“篡改”引用计数
+析构函数递减引用计数，如果引用计数为0，则释放ps指向的string：
+```
+HasPtr::~HasPtr()
+{
+  if (--*use == 0)
+  {
+    delete ps;
+    delete use;
+  }
+}
+```
+拷贝赋值运算符递增右侧对象的引用计数，递减左侧对象的引用计数，如果引用计数为0，需要释放左侧对象的资源。
+```
+HasPtr& HasPtr::operator=(const HasPtr &rhs)
+{
+  ++ *rhs.use;
+  if (--*use = 0)
+  {
+    delete use;
+    delete ps;
+  }
+  use = rhs.use;
+  i = rhs.i;
+  ps = rhs.ps;
+  return *this;
+}
+```
+## 13.3 交换操作
+  对于管理资源的类通常应当定义自己的swap。对于与重排元素顺序算法一起使用的类swap是非常重要的。
+  交换操作通常要做一次拷贝，两次赋值，对于两个指针：
+  ```
+    HasPtr c = a; // 拷贝
+    a = b; // 赋值
+    b = c; // 赋值
+  ```
+  - 
