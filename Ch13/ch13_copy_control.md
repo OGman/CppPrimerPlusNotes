@@ -66,7 +66,7 @@ HasPtr需要：
 定义一个拷贝构造函数，完成string的拷贝而不是拷贝指针。
 定义一个析构函数来释放string
 定义一个拷贝赋值运算符来释放当前对象的string，并从右侧对象拷贝string
-```
+``` C++
 class HasPtr {
 public:
   HasPtr(const std::string &s = std::string()):
