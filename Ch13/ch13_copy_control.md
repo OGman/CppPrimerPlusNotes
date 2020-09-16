@@ -177,3 +177,106 @@ void swap(HasPtr &lhs, HasPtr &rhs)
 1. elements指向分配内存中的首元素
 2. first_free 指向最后一个实际元素的下一位置
 3. cap 指向分配的内存末尾的下一位置
+```C++
+class StrVec{
+  public:
+    StrVec():
+      elements(nullptr), first_free(nullptr), cap(nullptr) {}
+    StrVec(const StrVec&);
+    StrVec &operator=(const StrVec &)；
+    ~StrVec();
+    void push_back(const std::string &);
+    size_t size() const {return first_free - elements;}
+    size_t capacity() const {return cap - elements;}
+    std::string *begin() const {return elements;}
+    std::string *end() const {return first_free;}
+  private:
+    static std::allocator<std::string> alloc;
+    void chk_n_alloc()
+      {if (size() == capacity()) rellocate();}
+    std::pair<std::string*, std::stirng*> alloc_n_copy
+      (const std::string*, const std::string*);
+    void free();
+    void reallocate();
+    std::string *elements;
+    std::string *first_free;
+    std::string *cap;
+};
+```
+- 使用construct
+```C++
+void StrVec::push_back(const std::string &s)
+{
+  chk_n_alloc();
+  alloc.construct(first_free++, s);
+}
+```
+- alloc_n_copy成员
+我们的StrVec类似标准库中的vector，是类值的类。
+```C++
+pair<string*, string*>
+StrVec::alloc_n_copy(const string *b, const string *e)
+{
+  auto data = alloc.allocate(e - b);
+  return {data, uninitialized_copy(b, e, data)};
+}
+```
+- free成员
+```C++
+void StrVec::free()
+{
+  if (elements)
+  {
+    for (auto p = first_free; p != elements;)
+      alloc.destory(--p);
+    alloc.deallocate(elements, cap - elements);
+  }
+}
+```
+free成员有两个职责，释放所有元素，释放对象之前分配的空间。
+- 拷贝控制成员
+```C++
+StrVec::StrVec(const StrVec &s)
+{
+    auto new_data = alloc_n_copy(s.begin, s.end);
+    elements = new_data.first;
+    first_free = cap = new_data.second;
+}
+
+StrVec::~StrVec() { free(); }
+
+StrVec &StrVec::operator=(const StrVec &rhs)
+{
+    auto new_data = alloc_n_copy(rhs.begin, rhs.end);
+    free();
+    elements = new_data.first;
+    first_free = cap = new_data.second;
+    return *this;
+}
+```
+- 在重新分配的过程中移动而不是拷贝元素
+string拷贝时，会将里面的内容也进行拷贝，这时如果能避免拷贝，我们的分配效率将极大提高
+- 移动构造函数和`std::move`
+string定义了移动构造函数
+std::move，定义在utility头文件中，移动构造函数必须与std::move配合使用，使用std::move时我们不使用using声明，而是直接使用std::move
+- reallocate成员
+```C++
+void StrVec::reallocate()
+{
+    auto newcapacity = size() ? 2 * size() : 1;
+    auto newdata = alloc.allocate(newcapacity);
+    auto dest = newdata;
+    auto elem = elements;
+    for (size_t i = 0; i !=size(); ++i)
+        alloc.construct(dest++, std::move(*element++));
+    free();
+    elements = newdata;
+    first_free = dest;
+    cap = elements + newcapacity;
+}
+```
+## 13.6 对象移动
+不必要的对象拷贝会耗费大量的时间，C++11标准中引入了对象移动的新特性来避免这点。标准库容器、string和shared_ptr类既支持移动也支持拷贝，unique_ptr类只支持移动。
+### 13.6.1 右值引用
+
+

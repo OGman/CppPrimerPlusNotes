@@ -40,7 +40,7 @@ C++ STL是C++程序员的重要工具，有些核心库设施每一个程序员�
 - 顶层const：
   指针有两层：指针为顶层，指针指向的对象为底层。指针本身为const则为顶层const，指针指向的对象为const为底层const
   ```
-  const int *p = 1;  //底层const，指向的对象必须是const类型
-  int *const p = 1;  //顶层const，只能指向这个对象，指向的对象本身可变
+  const int *p = 1;  //底层const，指向的对象必须是const类型，指针内存放的地址可变
+  int *const p = 1;  //顶层const，指针内存放的地址为常量，指向的对象本身可变
   ```
   
