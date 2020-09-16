@@ -170,3 +170,10 @@ void swap(HasPtr &lhs, HasPtr &rhs)
 }
 ```
 - swap函数应调用swap，而不是std::swap
+## 13.5 动态内存管理类
+需要动态管理内存的类一般可以使用标准库容器来实现。如果需要自己分配内存，则需要定义自己的拷贝控制成员来进行。本小节将实现一个只能存放string的vector类。
+- StrVec类的设计
+每个StrVec对象有三个指针：
+1. elements指向分配内存中的首元素
+2. first_free 指向最后一个实际元素的下一位置
+3. cap 指向分配的内存末尾的下一位置
