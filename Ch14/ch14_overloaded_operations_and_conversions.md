@@ -118,13 +118,161 @@ Sales_data& Sales_data::operator+=(const Sales_data &rhs)
   return *this;
 }
 ```
-## 14.5 下标运算符
+## 14.5 下标运算符[]
+容器类需要下标运算符来访问元素。下标运算符必须是成员函数。
+下标运算符的返回值一般是成员的引用，这样我们方便将其放在赋值号的左边或者右边。我们最好同时定义返回值为常量的版本和非常量的版本。这样当下标运算符作用于常量对象时，可以确保返回值不被改变。
+```C++
+class StrVec {
+public：
+  std::string& operator[](std::size_t n)
+  {
+    return elements[n];
+  }
+  const std::string& operator[](std::size_t n) const
+  {
+    return elements[n];
+  }
+private:
+  std::string *elements;
+};
+```
+如果作用的对象是一个常量的StrVec，将调用常量版本的[]，返回常量对象
 ## 14.6 递增和递减运算符
+递增和递减运算符在迭代器类中通常会实现。由于这两种运算符直接改变对象的值，因此作为类的成员函数比较好。
+内置的递增运算符和递减运算符包含前置和后置版本。我们在重载时也应实现。
+- 定义前置递增/递减运算符
+```C++
+class StrBlobPtr {
+public:
+  StrBlobPtr& operator++();
+  StrBlobPtr& operator--();
+};
+
+StrBlobPtr& StrBlobPtr::operator++()
+{
+  check(curr, "increment past end of StrBlobPtr");
+  ++curr;
+  return *this;
+}
+
+StrBlobPtr& StrBlobPtr::operator--()
+{
+  --curr;
+  check(curr, "decrement past begin of StrBlobPtr");
+  return *this;
+}
+```
+- 区分前置和后置运算符
+C++为了区分前置和后置的版本，在后置版本声明时加入了一个额外的int类型的形参。这个int的唯一作用就是标识这一重载版本为后置。
+```C++
+class StrBlobPtr{
+public:
+  StrBlobPtr operator++(int);
+  StrBlobPtr operator--(int);
+};
+
+StrBlobPtr StrBlobPtr::operator++(int)
+{
+  StrBlobPtr ret = *this;
+  ++*this;
+  return ret;
+}
+
+StrBlobPtr StrBlobPtr::operator--(int)
+{
+  StrBlobPtr ret = *this;
+  --*this;
+  return ret;
+}
+```
+- 显式地调用后置运算符
+在显式调用后置运算符时，必须传入一个int类型的参数，编译器才知道调用的是后置版本
 ## 14.7 成员访问运算符
-## 14.8 函数调用运算符
+成员访问运算符包括两种：->和\*
+``` C++
+class StrBlobPtr {
+public:
+  std::string& operator*() const
+  {
+    auto p = check(curr, "dereference past end");
+    return (*p)[curr];
+  }
+  std::string* operator->() const
+  {
+    return & this->operator*();
+  }
+}
+```
+将这两个运算符定义为const成员是因为这两个成员并不会改变对象的状态。
+- 对箭头运算符返回值的限定
+箭头运算符只能获取成员。其返回值必须是一个指针。对于一个重载了箭头运算符的对象point，point->mem相当于point.operator->()->mem
+重载运算符必须返回类的指针或自定义了箭头运算符的某个类的对象
+## 14.8 函数调用运算符()
+如果重载了()，则能够像调用函数一样调用类的对象，相比于普通函数，这种对象还可以保存状态，更加灵活
+函数调用运算符必须是成员函数，如果定义了调用运算符，则该类的对象被称为函数对象
+- 含有状态的函数对象类
+``` C++
+class PrintString {
+public:
+  PrintString(ostream &o = cout, char c = ' '):
+    os(o), sep(c) {}
+  void operator() (cosnt string &s) const { os << s << sep; }
+private:
+  ostream &os;
+  char sep;
+}
+```
+函数对象常常用作泛型算法的实参，如```for_each(vs.begin(), vs.end(), PrintString(cerr, '\n'));```
 ### 14.8.1 lambda是函数对象
+``` C++
+stable_sort(words.begin(), words.end(), [](const string &a, const string &b) {return a.size() < b.size();});
+
+//其中的lambda表达式类似于下面的类
+class ShorterString {
+public:
+  bool operator() (const string &a, const string &b) const
+  {
+    return a.size() < b.size();
+  }
+};
+
+//前面的表达式等价于下面
+stable_sort(words.begin(), words.end(), ShorterString());
+```
+- 表示lambda及相应捕获行为的类
+lambda表达式通过引用捕获变量时，由程序确保lambda执行时引用的对象确实存在。当lambda表达式通过值捕获变量时需要拷贝到lambda中，需要建立对应的数据成员。
+``` C++
+auto wc = find_if(words.begin(), words.end(), 
+                  [sz](const string &a) {return a.size() >= b.size();});
+//其中的lambda表达式类似下面的类：
+class SizeComp {
+public:
+  SizeComp(size_t n): sz(n) {}
+  bool operator() (const string &s) const
+    {return s.size() >= sz;}
+private:
+  size_t sz;
+};
+
+//表达式等价于
+auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
+```
 ### 14.8.2 标准库定义的函数对象
+- 在算法中使用标准库函数对象
+在泛型算法中比较方便使用
 ### 14.8.3 可调用对象与function
+C++中的可调用对象有：函数、函数指针、lambda表达式、bind创建的对象、重载了函数调用运算符的类。
+可调用对象有不同的类型，例如函数和函数指针的类型由它的返回值和实参数量及类型确定，每个lambda表达式有自己的类类型(未命名)。但不同类型的可调用对象可能共享同一种调用形式，一种调用形式对应一个函数类型：例如int(int, int)
+- 不同类型可能具有相同的调用形式
+相同的调用形式可以用标准库中的function类型统一起来。
+function<int (int, int)>可以用所有相同调用形式的可调用对象来赋值。
+``` C++
+int add(int a1, int a2)
+  { return a1 + a2; }
+function<int (int, int)> f1 = add;
+```
+- 重载的函数与function
+上面例子中，当函数重载时，不能使用函数名来赋值f1，这时有两种方法：函数指针或lambda表达式
 ## 14.9 重载、类型转换与运算符
 ### 14.9.1 类型转换运算符
 ### 14.9.2 避免有二义性的类型转换
