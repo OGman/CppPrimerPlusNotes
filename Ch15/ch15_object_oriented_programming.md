@@ -1,5 +1,34 @@
 # 面向对象程序设计
 ## 15.1 OOP：概述
+面向对象的基础是数据抽象、继承和动态绑定。通过数据抽象，我们将类的接口与实现分离；通过继承，可以定义相似的类型并对其相似关系建模；使用动态绑定，可以在一定程度上忽略相似类型的区别，而以统一的方式使用他们的对象
+- 继承
+基类与派生类
+我们将定义两个类，Quote与派生类Bulk_quote
+``` C++
+class Quote {
+  public:
+    std::string isbn() const;
+    virtual double net_price(std::size_t n) const;
+};
+
+class Bulk_quote : public Quote {
+  public:
+    double net_price(std::size_t) const override;
+};
+```
+对于基类允许派生类重新定义的函数，我们声明为虚函数，即在前面加上virtual。在派生类中重新定义虚函数时可以在最后加上virtual来注明他使用这个成员函数来改写基类的虚函数。
+- 动态绑定
+``` C++
+double print_total(ostream &os, const Quote &item, size_t n)
+{
+  double ret = item.net_price(n);
+  os << "ISBN: " << item.isbn()
+     << " # sold: " << n << " total due: " << ret << endl;
+  return ret;
+}
+```
+调用这个函数，当传入基类对象时，调用的是基类的net_price，传入派生类对象，则调用派生类的对应函数
+当我们使用基类的引用或指针调用一个虚函数时发生动态绑定
 ## 15.2 定义基类和派生类
 ### 15.2.1 定义基类
 ### 15.2.2 定义派生类
