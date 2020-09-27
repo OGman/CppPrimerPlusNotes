@@ -16,7 +16,7 @@ class Bulk_quote : public Quote {
     double net_price(std::size_t) const override;
 };
 ```
-对于基类允许派生类重新定义的函数，我们声明为虚函数，即在前面加上virtual。在派生类中重新定义虚函数时可以在最后加上virtual来注明他使用这个成员函数来改写基类的虚函数。
+对于基类允许派生类重新定义的函数，我们声明为虚函数，即在前面加上virtual。在派生类中重新定义虚函数时可以在最后加上override来注明他使用这个成员函数来改写基类的虚函数。
 - 动态绑定
 ``` C++
 double print_total(ostream &os, const Quote &item, size_t n)
