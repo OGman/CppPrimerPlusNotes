@@ -250,6 +250,31 @@ class和struct仅有的差别是默认成员访问说明符即默认派生访问
 - 在容器中放置（智能）指针而非对象
 通常在容器中放置基类的指针
 ### 15.8.1 编写Basket类
-
+``` C++
+class Basket {
+public:
+  void add_item(const std::shared_ptr<Quote> &sale)
+    { items.insert(sale); }
+  double total_receipt(std::ostream&) const;
+private:
+  static bool compare(const std::shared_ptr<Quote> &lhs, const std::shared_ptr<Quote> &rhs)
+    { return lhs->isbn() < rhs->isbn(); }
+  std::multiset<std::shared_ptr<Quote>, decltype(compare)*> items{compare};
+};
+```
+- 定义Basket的成员
+``` C++
+double Basket::total_receipt(ostream &os) const
+{
+  double sum = 0.0;
+  for (auto iter = items.cbegin();
+    iter != items.cend();
+    iter = items.upper_bound(*iter)) {
+    sum += print_total(os, **iter, items.count(*iter));  
+  }
+  os << "Total Sale: " << sum << endl;
+  return sum;
+}
+```
 
 ## 15.9 再探文本查询
