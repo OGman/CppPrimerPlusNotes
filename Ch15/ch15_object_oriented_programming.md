@@ -137,9 +137,50 @@ double undicounted = baseP->Quote::net_price(42);
 如果派生类在虚函数中想调用基类版本却没写作用域运算符，将调用派生类的版本，产生无限递归
 
 ## 15.4 抽象基类
-纯虚函数
+- 纯虚函数
+
+我们不希望用户构造基类的对象，可以将其中的成员函数定义为纯虚函数
+``` C++
+class Disc_quote : public Quote {
+public:
+  Disc_quote() = default;
+  Disc_quote(const std::string &book, double price, std::size_t qty, double disc):
+    Quote(book, price), quantity(qty), discount(disc) {}
+  double net_price(std::size_t) const = 0;
+protected:
+  std::size_t quantity = 0;
+  double discount = 0.0;
+};
+```
+虽然我们不想构造本类的对象，我们也必须提供构造函数。让继承本类的派生类正确初始化基类部分
+可以在类外为纯虚函数提供函数体
+
+- 含有纯虚函数的类是抽象基类
+
+含有纯虚函数的类是抽象基类，未经覆盖直接继承纯虚函数的类也是。无法创建抽象基类的对象
+
+- 派生类构造函数只初始化它的直接基类
+
+``` C++
+class Bulk_quote : public Disc_quote {
+public:
+  Bulk_quote() = default;
+  Bulk_quote(const std::string &book, double price, std::size_t qty, double disc):
+    Disc_quote(book, price, qty, disc) {}
+  double net_price(std::size_t) const override;
+};
+```
+
 ## 15.5 访问控制和继承
+每个类自己控制自己成员的初始化，也控制自己成员的对于派生类来说是否可访问
 - 受保护的成员
+
+protected成员有以下三点性质：
+1. 对于基类本身，protected对其用户与private相同
+2. 对于派生类与友元，其从基类继承的protected成员与可以直接访问
+3. 对于派生类的用户，基类的protected成员为private的，只有通过派生类的对象才可以访问
+派生类的成员和友元只能访问派生类对象中的基类部分受保护成员，不能访问普通基类对象的成员
+
 - 公有、私有和保护继承
 - 派生类向基类转换的可访问性
 - 友元和继承
