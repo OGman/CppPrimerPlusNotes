@@ -1,7 +1,7 @@
 const_cast的作用是去掉const指针或const引用的const属性。
 使用场景一般有两种：
-1. 一个不修改对象的函数将参数定义为非const，想要传入const引用或指针时，可以用const_cast去掉const属性
-2. 一个可修改的对象，却只有一个const的指针或引用可使用，这时需要在可变场景下使用这个对象时，可以用const_cast去掉const属性
+1. 一个不修改参数对象的函数将参数定义为非const，想要传入const引用或指针时，可以用const_cast去掉const属性
+2. 一个可修改的对象，却因为某些原因变成了const，只有const的指针或引用可使用，这时需要在可变场景下使用这个对象时，可以用const_cast去掉const属性。
 ``` C++
 int a = 10;
 const int *p = &a;
